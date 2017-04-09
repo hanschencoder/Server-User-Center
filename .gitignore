@@ -1,0 +1,10 @@
+# Gradle
+build/
+gradle.properties
+.gradle
+local.properties
+
+# IntelliJ IDEA
+.idea
+*.iml
+
