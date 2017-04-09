@@ -56,11 +56,81 @@ message RegisterReply {
     ErrorCode errCode = 3; // 注册失败的错误码
 }
 
+message AuthorizationRequest {
+    string username = 1;
+    string password_md5 = 2;
+}
+
+message AuthorizationReply {
+    bool succeed = 1; // 密码是否正确
+    string authorization = 2; // 授权码
+}
+
+message NewPassword {
+    string token = 1; // 用户标识
+    string newPassword = 2; // 新的密码
+    string authorization = 3; // 授权码
+}
+
+message NewPasswordReply {
+
+    enum ErrorCode {
+        PASSWORD_NOT_CHANGED = 0;
+        AUTHORIZATION_INVALID = 1;
+    }
+
+    bool succeed = 1; // 修改密码是否成功
+    ErrorCode errCode = 3; // 修改密码失败的错误码
+}
+
+message OperateToken {
+    string token = 1;
+}
+
+message UpdateRequest {
+    string token = 1;
+    UserInfo userInfo = 2;
+}
+
+message ResultReply {
+    bool secceed = 1;
+}
+
+message UserInfo {
+    string nickname = 1;
+    string email = 2;
+    string phone = 3;
+    string birthday = 4;
+    int32 age = 5;
+    Sex sex = 6;
+    string bio = 7;
+    string Location = 8;
+}
+
 service UserCenter {
+
+    // 登录接口
     rpc login (LoginInfo) returns (LoginReply) {
     }
 
+    // 注册接口
     rpc register (RegisterInfo) returns (RegisterReply) {
+    }
+
+    // 请求修改密码授权码
+    rpc requestAuthorization (AuthorizationRequest) returns (AuthorizationReply) {
+    }
+
+    // 修改密码
+    rpc changePassword (NewPassword) returns (NewPasswordReply) {
+    }
+
+    // 获取用户信息
+    rpc requestUserInfo (OperateToken) returns (UserInfo) {
+    }
+
+    // 修改用户信息
+    rpc updateUserInfo (UpdateRequest) returns (ResultReply) {
     }
 }
 

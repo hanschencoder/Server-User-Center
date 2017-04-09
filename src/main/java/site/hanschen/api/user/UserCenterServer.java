@@ -93,6 +93,31 @@ public class UserCenterServer {
         @Override
         public void register(RegisterInfo request, StreamObserver<RegisterReply> responseObserver) {
             super.register(request, responseObserver);
+            // TODO:
+        }
+
+        @Override
+        public void requestAuthorization(AuthorizationRequest request, StreamObserver<AuthorizationReply> responseObserver) {
+            super.requestAuthorization(request, responseObserver);
+            // TODO:
+        }
+
+        @Override
+        public void changePassword(NewPassword request, StreamObserver<NewPasswordReply> responseObserver) {
+            super.changePassword(request, responseObserver);
+            // TODO:
+        }
+
+        @Override
+        public void requestUserInfo(OperateToken request, StreamObserver<UserInfo> responseObserver) {
+            super.requestUserInfo(request, responseObserver);
+            // TODO:
+        }
+
+        @Override
+        public void updateUserInfo(UpdateRequest request, StreamObserver<ResultReply> responseObserver) {
+            super.updateUserInfo(request, responseObserver);
+            // TODO:
         }
     }
 }
