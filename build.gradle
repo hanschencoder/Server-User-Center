@@ -32,6 +32,8 @@ dependencies {
     compile "io.grpc:grpc-protobuf:${grpcVersion}"
     compile "io.grpc:grpc-stub:${grpcVersion}"
 
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+
     testCompile "junit:junit:4.11"
     testCompile "org.mockito:mockito-core:1.9.5"
 }
