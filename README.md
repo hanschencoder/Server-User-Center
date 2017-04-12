@@ -1,3 +1,7 @@
+# Server-User-Center
+
+[![Build Status](https://travis-ci.org/shensky711/Server-User-Center.svg?branch=master)](https://travis-ci.org/shensky711/Server-User-Center)
+
 # 用户中心模块后端代码
  - 框架：gRPC
  - 语言：Java
