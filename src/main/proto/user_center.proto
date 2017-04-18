@@ -104,7 +104,7 @@ message UserInfo {
     int32 age = 5;
     Sex sex = 6;
     string bio = 7;
-    string Location = 8;
+    string location = 8;
 }
 
 service UserCenter {
