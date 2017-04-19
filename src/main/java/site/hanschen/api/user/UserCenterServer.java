@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import site.hanschen.api.user.db.UserCenterRepository;
+import site.hanschen.api.user.db.UserCenterRepositoryImpl;
 
 /**
  * @author HansChen
@@ -13,16 +15,16 @@ public class UserCenterServer {
     private final int    port;
     private final Server server;
 
-    public UserCenterServer(int port) throws IOException {
-        this(ServerBuilder.forPort(port), port);
+    public UserCenterServer(int port, UserCenterRepository repository) throws IOException {
+        this(ServerBuilder.forPort(port), port, repository);
     }
 
     /**
      * Create a UserCenter server using serverBuilder
      */
-    public UserCenterServer(ServerBuilder<?> serverBuilder, int port) {
+    public UserCenterServer(ServerBuilder<?> serverBuilder, int port, UserCenterRepository repository) {
         this.port = port;
-        server = serverBuilder.addService(new UserCenterService()).build();
+        server = serverBuilder.addService(new UserCenterService(repository)).build();
     }
 
     /**
@@ -60,7 +62,7 @@ public class UserCenterServer {
     }
 
     public static void main(String[] args) throws Exception {
-        UserCenterServer server = new UserCenterServer(8980);
+        UserCenterServer server = new UserCenterServer(8980, new UserCenterRepositoryImpl());
         server.start();
         server.blockUntilShutdown();
     }

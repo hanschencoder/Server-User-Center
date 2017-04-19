@@ -19,7 +19,7 @@ public class UserCenterRepositoryImpl implements UserCenterRepository {
 
     private SessionFactory mFactory = null;
 
-    private UserCenterRepositoryImpl() {
+    public UserCenterRepositoryImpl() {
         // TODO: MySQL帐号密码应从配置文件读取
         Configuration cfg = new Configuration().configure("hibernate.cfg.xml")
                                                .setProperty("hibernate.connection.username", "root")
