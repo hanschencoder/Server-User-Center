@@ -6,14 +6,12 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * @author HansChen
  */
 @Entity
-@Table(name = "UserInfo", schema = "UserCenter", catalog = "")
-public class UserInfoEntity {
+public class UserInfo {
     private long id;
     private Long userId;
     private String email;
@@ -132,27 +130,27 @@ public class UserInfoEntity {
         if (o == null || getClass() != o.getClass())
             return false;
 
-        UserInfoEntity that = (UserInfoEntity) o;
+        UserInfo userInfo = (UserInfo) o;
 
-        if (id != that.id)
+        if (id != userInfo.id)
             return false;
-        if (userId != null ? !userId.equals(that.userId) : that.userId != null)
+        if (userId != null ? !userId.equals(userInfo.userId) : userInfo.userId != null)
             return false;
-        if (email != null ? !email.equals(that.email) : that.email != null)
+        if (email != null ? !email.equals(userInfo.email) : userInfo.email != null)
             return false;
-        if (nickname != null ? !nickname.equals(that.nickname) : that.nickname != null)
+        if (nickname != null ? !nickname.equals(userInfo.nickname) : userInfo.nickname != null)
             return false;
-        if (phone != null ? !phone.equals(that.phone) : that.phone != null)
+        if (phone != null ? !phone.equals(userInfo.phone) : userInfo.phone != null)
             return false;
-        if (birthday != null ? !birthday.equals(that.birthday) : that.birthday != null)
+        if (birthday != null ? !birthday.equals(userInfo.birthday) : userInfo.birthday != null)
             return false;
-        if (age != null ? !age.equals(that.age) : that.age != null)
+        if (age != null ? !age.equals(userInfo.age) : userInfo.age != null)
             return false;
-        if (sex != null ? !sex.equals(that.sex) : that.sex != null)
+        if (sex != null ? !sex.equals(userInfo.sex) : userInfo.sex != null)
             return false;
-        if (bio != null ? !bio.equals(that.bio) : that.bio != null)
+        if (bio != null ? !bio.equals(userInfo.bio) : userInfo.bio != null)
             return false;
-        if (location != null ? !location.equals(that.location) : that.location != null)
+        if (location != null ? !location.equals(userInfo.location) : userInfo.location != null)
             return false;
 
         return true;

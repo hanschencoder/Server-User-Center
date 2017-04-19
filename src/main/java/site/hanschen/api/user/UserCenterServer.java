@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.stub.StreamObserver;
 
 /**
  * @author HansChen
@@ -64,60 +63,5 @@ public class UserCenterServer {
         UserCenterServer server = new UserCenterServer(8980);
         server.start();
         server.blockUntilShutdown();
-    }
-
-    /**
-     * Our implementation of UserCenter service.
-     *
-     * <p>See user_center.proto for details of the methods.
-     */
-    private static class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
-
-        UserCenterService() {
-        }
-
-        @Override
-        public void login(LoginInfo request, StreamObserver<LoginReply> responseObserver) {
-            System.out.println("Received request from client:");
-            System.out.println(request.toString());
-            LoginReply reply = LoginReply.newBuilder()
-                                         .setSucceed(true)
-                                         .setToken("df4d58f7d5f1s25df4ds5f4d5f4df5d5fd5sf4")
-                                         .build();
-            System.out.println("send Response:");
-            System.out.println(reply.toString());
-            responseObserver.onNext(reply);
-            responseObserver.onCompleted();
-        }
-
-        @Override
-        public void register(RegisterInfo request, StreamObserver<RegisterReply> responseObserver) {
-            super.register(request, responseObserver);
-            // TODO:
-        }
-
-        @Override
-        public void requestAuthorization(AuthorizationRequest request, StreamObserver<AuthorizationReply> responseObserver) {
-            super.requestAuthorization(request, responseObserver);
-            // TODO:
-        }
-
-        @Override
-        public void changePassword(NewPassword request, StreamObserver<NewPasswordReply> responseObserver) {
-            super.changePassword(request, responseObserver);
-            // TODO:
-        }
-
-        @Override
-        public void requestUserInfo(OperateToken request, StreamObserver<UserInfo> responseObserver) {
-            super.requestUserInfo(request, responseObserver);
-            // TODO:
-        }
-
-        @Override
-        public void updateUserInfo(UpdateRequest request, StreamObserver<ResultReply> responseObserver) {
-            super.updateUserInfo(request, responseObserver);
-            // TODO:
-        }
     }
 }

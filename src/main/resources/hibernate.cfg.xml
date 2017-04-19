@@ -9,13 +9,14 @@
         <!-- <property name="connection.username"/> -->
         <!-- <property name="connection.password"/> -->
         <property name="show_sql">true</property>
+        <property name="format_sql">true</property>
         <property name="connection.useUnicode">true</property>
         <property name="connection.characterEncoding">UTF-8</property>
-        <!--<property name="format_sql">true</property>-->
+        <property name="current_session_context_class">thread</property>
         <!-- DB schema will be updated if needed -->
         <!-- <property name="hbm2ddl.auto">update</property> -->
 
-        <mapping class="site.hanschen.api.user.db.entity.UserEntity"/>
-        <mapping class="site.hanschen.api.user.db.entity.UserInfoEntity"/>
+        <mapping class="site.hanschen.api.user.db.entity.User"/>
+        <mapping class="site.hanschen.api.user.db.entity.UserInfo"/>
     </session-factory>
 </hibernate-configuration>

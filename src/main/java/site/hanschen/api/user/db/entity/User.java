@@ -4,14 +4,12 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * @author HansChen
  */
 @Entity
-@Table(name = "User", schema = "UserCenter", catalog = "")
-public class UserEntity {
+public class User {
     private long userId;
     private String email;
     private String password;
@@ -64,15 +62,15 @@ public class UserEntity {
         if (o == null || getClass() != o.getClass())
             return false;
 
-        UserEntity that = (UserEntity) o;
+        User user = (User) o;
 
-        if (userId != that.userId)
+        if (userId != user.userId)
             return false;
-        if (email != null ? !email.equals(that.email) : that.email != null)
+        if (email != null ? !email.equals(user.email) : user.email != null)
             return false;
-        if (password != null ? !password.equals(that.password) : that.password != null)
+        if (password != null ? !password.equals(user.password) : user.password != null)
             return false;
-        if (passwordMd5 != null ? !passwordMd5.equals(that.passwordMd5) : that.passwordMd5 != null)
+        if (passwordMd5 != null ? !passwordMd5.equals(user.passwordMd5) : user.passwordMd5 != null)
             return false;
 
         return true;
