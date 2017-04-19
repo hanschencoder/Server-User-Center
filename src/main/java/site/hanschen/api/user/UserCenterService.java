@@ -2,6 +2,8 @@ package site.hanschen.api.user;
 
 import io.grpc.stub.StreamObserver;
 import site.hanschen.api.user.db.UserCenterRepository;
+import site.hanschen.api.user.db.entity.User;
+import site.hanschen.api.user.utils.TextUtils;
 
 /**
  * Our implementation of UserCenter service.
@@ -18,19 +20,56 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
 
     @Override
     public void login(LoginInfo request, StreamObserver<LoginReply> responseObserver) {
-        super.login(request, responseObserver);
-        // TODO:
+
+        LoginReply.Builder builder = LoginReply.newBuilder();
+        builder.setSucceed(false);
+
+        String username = request.getUsername();
+        String md5 = request.getPasswordMd5();
+        if (TextUtils.isEmpty(username)) {
+            builder.setErrCode(LoginReply.ErrorCode.ACCOUNT_EMPTY);
+        } else if (TextUtils.isEmpty(md5)) {
+            builder.setErrCode(LoginReply.ErrorCode.PASSWORD_EMPTY);
+        } else {
+            User user = mUserRepository.getUserByEmail(username);
+            if (user == null || !md5.equals(user.getPasswordMd5())) {
+                builder.setErrCode(LoginReply.ErrorCode.ACCOUNT_PASSWORD_INCORRECT);
+            } else {
+                builder.setSucceed(true);
+            }
+        }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
     public void register(RegisterInfo request, StreamObserver<RegisterReply> responseObserver) {
-        super.register(request, responseObserver);
-        String email = request.getEmail();
+
         RegisterReply.Builder builder = RegisterReply.newBuilder();
+        builder.setSucceed(false);
+
+        String email = request.getEmail();
         if (mUserRepository.getUserByEmail(email) != null) {
             builder.setErrCode(RegisterReply.ErrorCode.EMAIL_ALREADY_REGISTERED);
-            builder.setSucceed(false);
+        } else if (request.getPassword() == null || request.getPassword().length() < 8) {
+            builder.setErrCode(RegisterReply.ErrorCode.PASSWORD_INVALID);
+        } else if (!TextUtils.isEmailValid(email)) {
+            builder.setErrCode(RegisterReply.ErrorCode.EMAIL_INVALID);
+        } else {
+            User user = new User();
+            user.setEmail(email);
+            user.setPassword(request.getPassword());
+            user.setPasswordMd5(request.getPasswordMd5());
+            if (mUserRepository.insertUser(user)) {
+                builder.setSucceed(true);
+            } else {
+                builder.setErrCode(RegisterReply.ErrorCode.UNKNOWN);
+            }
         }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
