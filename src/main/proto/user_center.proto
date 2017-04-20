@@ -43,6 +43,7 @@ message VerificationReply {
     enum ErrorCode {
         EMAIL_INVALID = 0;
         EMAIL_ALREADY_REGISTERED = 1;
+        UNKNOWN = 2;
     }
 
     bool succeed = 1; // 是否成功

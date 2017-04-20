@@ -3,7 +3,7 @@ apply plugin: 'com.google.protobuf'
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         // ASSUMES GRADLE 2.12 OR HIGHER. Use plugin version 0.7.5 with earlier
@@ -13,7 +13,7 @@ buildscript {
 }
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 tasks.withType(JavaCompile) {
@@ -36,6 +36,9 @@ dependencies {
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.10.Final'
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'javax.activation', name: 'activation', version: '1.1.1'
+    compile group: 'javax.mail', name: 'mail', version: '1.4.7'
+    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.23'
 
     testCompile "junit:junit:4.11"
     testCompile "org.mockito:mockito-core:1.9.5"

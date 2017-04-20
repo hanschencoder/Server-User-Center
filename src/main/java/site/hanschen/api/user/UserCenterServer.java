@@ -9,6 +9,8 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import site.hanschen.api.user.db.UserCenterRepository;
 import site.hanschen.api.user.db.UserCenterRepositoryImpl;
+import site.hanschen.api.user.mail.MailSender;
+import site.hanschen.api.user.mail.MailSender163;
 
 /**
  * @author HansChen
@@ -20,16 +22,16 @@ public class UserCenterServer {
     private final int    port;
     private final Server server;
 
-    public UserCenterServer(int port, UserCenterRepository repository) throws IOException {
-        this(ServerBuilder.forPort(port), port, repository);
+    public UserCenterServer(int port, UserCenterRepository repository, MailSender sender) throws IOException {
+        this(ServerBuilder.forPort(port), port, repository, sender);
     }
 
     /**
      * Create a UserCenter server using serverBuilder
      */
-    public UserCenterServer(ServerBuilder<?> serverBuilder, int port, UserCenterRepository repository) {
+    public UserCenterServer(ServerBuilder<?> serverBuilder, int port, UserCenterRepository repository, MailSender sender) {
         this.port = port;
-        server = serverBuilder.addService(new UserCenterService(repository)).build();
+        server = serverBuilder.addService(new UserCenterService(repository, sender)).build();
     }
 
     /**
@@ -67,7 +69,9 @@ public class UserCenterServer {
     }
 
     public static void main(String[] args) throws Exception {
-        UserCenterServer server = new UserCenterServer(8980, new UserCenterRepositoryImpl());
+        UserCenterRepository repository = new UserCenterRepositoryImpl();
+        MailSender sender = new MailSender163("user_hanschen@163.com", "12345678abc");
+        UserCenterServer server = new UserCenterServer(8980, repository, sender);
         server.start();
         server.blockUntilShutdown();
     }

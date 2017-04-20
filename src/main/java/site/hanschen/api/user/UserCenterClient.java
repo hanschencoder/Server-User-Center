@@ -51,6 +51,20 @@ public class UserCenterClient {
         }
     }
 
+    public void requestVerificationCode() {
+        VerificationRequest request = VerificationRequest.newBuilder().setEmail("648524018@qq.com").build();
+        VerificationReply reply;
+        try {
+            System.out.println("Sent request to server:");
+            System.out.println(request.toString());
+            reply = blockingStub.requestVerificationCode(request);
+            System.out.println("Received response from server:");
+            System.out.println(reply.toString());
+        } catch (StatusRuntimeException e) {
+            System.out.println("RPC failed: {0}" + e.getStatus());
+        }
+    }
+
     public void shutdown() throws InterruptedException {
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
@@ -58,7 +72,7 @@ public class UserCenterClient {
     public static void main(String[] args) throws InterruptedException {
 
         UserCenterClient client = new UserCenterClient("localhost", 8980);
-        client.login();
+        client.requestVerificationCode();
         client.shutdown();
     }
 }
