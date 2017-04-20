@@ -2,7 +2,6 @@ package site.hanschen.api.user;
 
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -66,7 +65,6 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
     @Override
     public void requestVerificationCode(VerificationRequest request, StreamObserver<VerificationReply> responseObserver) {
 
-        logger.debug(request.toString());
         VerificationReply.Builder builder = VerificationReply.newBuilder();
         builder.setSucceed(false);
 
@@ -91,7 +89,7 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
     private String createHtml(String email, String verificationCode) {
         try {
             Configuration configuration = new Configuration(Configuration.VERSION_2_3_0);
-            configuration.setDirectoryForTemplateLoading(new File(getClass().getResource("/template").getPath()));
+            configuration.setClassLoaderForTemplateLoading(UserCenterService.class.getClassLoader(), "/template/");
             configuration.setDefaultEncoding("UTF-8");
             Template template = configuration.getTemplate("VerificationCode.ftl");
             Map<String, Object> dataModel = new HashMap<>();
@@ -99,7 +97,6 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
             dataModel.put("verificationCode", verificationCode);
             Writer writer = new StringWriter();
             template.process(dataModel, writer);
-            logger.debug(writer.toString());
             return writer.toString();
         } catch (IOException | TemplateException e) {
             logger.error("oops", e);
@@ -109,7 +106,7 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
 
     private Multipart makeMultipart(String email, String verificationCode) {
         MultipartBuilder builder = MultipartBuilder.newBuilder();
-        builder.setText(createHtml(email, verificationCode));
+        builder.setText(createHtml(email, verificationCode), "text/html; charset=utf-8");
         return builder.build();
     }
 

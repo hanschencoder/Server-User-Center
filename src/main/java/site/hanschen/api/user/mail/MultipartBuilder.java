@@ -32,6 +32,17 @@ public class MultipartBuilder {
     private MultipartBuilder() {
     }
 
+    public MultipartBuilder setText(String text, String type) {
+        try {
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(text, type);
+            textBody = messageBodyPart;
+        } catch (MessagingException ignored) {
+            logger.error("setText failed: ", ignored);
+        }
+        return this;
+    }
+
     public MultipartBuilder setText(String text) {
         try {
             BodyPart messageBodyPart = new MimeBodyPart();
