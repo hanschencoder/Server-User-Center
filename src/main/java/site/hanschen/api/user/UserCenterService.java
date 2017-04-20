@@ -44,6 +44,12 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
     }
 
     @Override
+    public void requestVerificationCode(VerificationRequest request, StreamObserver<VerificationReply> responseObserver) {
+        super.requestVerificationCode(request, responseObserver);
+        // TODO:
+    }
+
+    @Override
     public void register(RegisterInfo request, StreamObserver<RegisterReply> responseObserver) {
 
         RegisterReply.Builder builder = RegisterReply.newBuilder();

@@ -34,6 +34,8 @@ dependencies {
 
     compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.10.Final'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 
     testCompile "junit:junit:4.11"
     testCompile "org.mockito:mockito-core:1.9.5"

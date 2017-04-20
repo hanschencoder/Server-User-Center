@@ -1,5 +1,8 @@
 package site.hanschen.api.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 
 import io.grpc.Server;
@@ -11,6 +14,8 @@ import site.hanschen.api.user.db.UserCenterRepositoryImpl;
  * @author HansChen
  */
 public class UserCenterServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserCenterServer.class);
 
     private final int    port;
     private final Server server;
@@ -32,13 +37,13 @@ public class UserCenterServer {
      */
     public void start() throws IOException {
         server.start();
-        System.out.println("Server started, listening on " + port);
+        logger.debug("Server started, listening on " + port);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                System.err.println("*** shutting down gRPC server since JVM is shutting down");
+                logger.error("*** shutting down gRPC server since JVM is shutting down");
                 UserCenterServer.this.stop();
-                System.err.println("*** server shut down");
+                logger.error("*** server shut down");
             }
         });
     }
