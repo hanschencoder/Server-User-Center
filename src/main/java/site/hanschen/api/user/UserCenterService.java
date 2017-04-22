@@ -14,6 +14,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import io.grpc.stub.StreamObserver;
+import site.hanschen.api.user.auth.AuthManager;
 import site.hanschen.api.user.db.UserCenterRepository;
 import site.hanschen.api.user.db.entity.User;
 import site.hanschen.api.user.mail.MailSender;
@@ -31,10 +32,12 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
 
     private UserCenterRepository mUserRepository;
     private MailSender           mMailSender;
+    private AuthManager          mAuthManager;
 
-    public UserCenterService(UserCenterRepository repository, MailSender mailSender) {
+    public UserCenterService(UserCenterRepository repository, MailSender mailSender, AuthManager authManager) {
         this.mUserRepository = repository;
         this.mMailSender = mailSender;
+        this.mAuthManager = authManager;
     }
 
     @Override
@@ -74,7 +77,9 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
         } else if (!TextUtils.isEmailValid(email)) {
             builder.setErrCode(VerificationReply.ErrorCode.EMAIL_INVALID);
         } else {
-            boolean succeed = mMailSender.send(email, "帐号注册", makeMultipart(email, "468754"));
+            String verificationCode = String.valueOf(getRandNum(1, 999999));
+            boolean succeed = mMailSender.send(email, "帐号注册", createMultipart(email, verificationCode));
+            succeed &= mAuthManager.addVerificationCode(email, verificationCode);
             if (succeed) {
                 builder.setSucceed(true);
             } else {
@@ -84,6 +89,16 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
+    }
+
+    private int getRandNum(int min, int max) {
+        return min + (int) (Math.random() * ((max - min) + 1));
+    }
+
+    private Multipart createMultipart(String email, String verificationCode) {
+        MultipartBuilder builder = MultipartBuilder.newBuilder();
+        builder.setText(createHtml(email, verificationCode), "text/html; charset=utf-8");
+        return builder.build();
     }
 
     private String createHtml(String email, String verificationCode) {
@@ -104,12 +119,6 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
         }
     }
 
-    private Multipart makeMultipart(String email, String verificationCode) {
-        MultipartBuilder builder = MultipartBuilder.newBuilder();
-        builder.setText(createHtml(email, verificationCode), "text/html; charset=utf-8");
-        return builder.build();
-    }
-
     @Override
     public void register(RegisterInfo request, StreamObserver<RegisterReply> responseObserver) {
 
@@ -123,6 +132,8 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
             builder.setErrCode(RegisterReply.ErrorCode.PASSWORD_INVALID);
         } else if (!TextUtils.isEmailValid(email)) {
             builder.setErrCode(RegisterReply.ErrorCode.EMAIL_INVALID);
+        } else if (!mAuthManager.checkVerificationCode(email, request.getVerificationCode())) {
+            builder.setErrCode(RegisterReply.ErrorCode.VERIFICATION_CODE_ERROR);
         } else {
             User user = new User();
             user.setEmail(email);

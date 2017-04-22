@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import site.hanschen.api.user.auth.AuthManager;
+import site.hanschen.api.user.auth.AuthManagerImpl;
 import site.hanschen.api.user.db.UserCenterRepository;
 import site.hanschen.api.user.db.UserCenterRepositoryImpl;
 import site.hanschen.api.user.mail.MailSender;
@@ -22,16 +24,23 @@ public class UserCenterServer {
     private final int    port;
     private final Server server;
 
-    public UserCenterServer(int port, UserCenterRepository repository, MailSender sender) throws IOException {
-        this(ServerBuilder.forPort(port), port, repository, sender);
+    public UserCenterServer(int port,
+                            UserCenterRepository repository,
+                            MailSender sender,
+                            AuthManager authManager) throws IOException {
+        this(ServerBuilder.forPort(port), port, repository, sender, authManager);
     }
 
     /**
      * Create a UserCenter server using serverBuilder
      */
-    public UserCenterServer(ServerBuilder<?> serverBuilder, int port, UserCenterRepository repository, MailSender sender) {
+    public UserCenterServer(ServerBuilder<?> serverBuilder,
+                            int port,
+                            UserCenterRepository repository,
+                            MailSender sender,
+                            AuthManager authManager) {
         this.port = port;
-        server = serverBuilder.addService(new UserCenterService(repository, sender)).build();
+        server = serverBuilder.addService(new UserCenterService(repository, sender, authManager)).build();
     }
 
     /**
@@ -71,7 +80,8 @@ public class UserCenterServer {
     public static void main(String[] args) throws Exception {
         UserCenterRepository repository = new UserCenterRepositoryImpl();
         MailSender sender = new MailSender163("user_hanschen@163.com", "12345678abc");
-        UserCenterServer server = new UserCenterServer(8980, repository, sender);
+        AuthManager authManager = new AuthManagerImpl();
+        UserCenterServer server = new UserCenterServer(8980, repository, sender, authManager);
         server.start();
         server.blockUntilShutdown();
     }
