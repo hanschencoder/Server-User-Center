@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.mail.Multipart;
 
 import freemarker.template.Configuration;
@@ -30,14 +31,15 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(UserCenterService.class);
 
-    private UserCenterRepository mUserRepository;
-    private MailSender           mMailSender;
-    private AuthManager          mAuthManager;
+    @Inject
+    UserCenterRepository mUserRepository;
+    @Inject
+    MailSender           mMailSender;
+    @Inject
+    AuthManager          mAuthManager;
 
-    public UserCenterService(UserCenterRepository repository, MailSender mailSender, AuthManager authManager) {
-        this.mUserRepository = repository;
-        this.mMailSender = mailSender;
-        this.mAuthManager = authManager;
+    public UserCenterService() {
+
     }
 
     @Override

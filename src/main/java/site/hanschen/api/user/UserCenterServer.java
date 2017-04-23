@@ -5,14 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import site.hanschen.api.user.auth.AuthManager;
-import site.hanschen.api.user.auth.AuthManagerImpl;
-import site.hanschen.api.user.db.UserCenterRepository;
-import site.hanschen.api.user.db.UserCenterRepositoryImpl;
-import site.hanschen.api.user.mail.MailSender;
-import site.hanschen.api.user.mail.MailSender163;
 
 /**
  * @author HansChen
@@ -24,29 +19,15 @@ public class UserCenterServer {
     private final int    port;
     private final Server server;
 
-    public UserCenterServer(int port,
-                            UserCenterRepository repository,
-                            MailSender sender,
-                            AuthManager authManager) throws IOException {
-        this(ServerBuilder.forPort(port), port, repository, sender, authManager);
-    }
-
-    /**
-     * Create a UserCenter server using serverBuilder
-     */
-    public UserCenterServer(ServerBuilder<?> serverBuilder,
-                            int port,
-                            UserCenterRepository repository,
-                            MailSender sender,
-                            AuthManager authManager) {
+    UserCenterServer(int port, BindableService service) throws IOException {
         this.port = port;
-        server = serverBuilder.addService(new UserCenterService(repository, sender, authManager)).build();
+        this.server = ServerBuilder.forPort(port).addService(service).build();
     }
 
     /**
      * Start serving requests.
      */
-    public void start() throws IOException {
+    void start() throws IOException {
         server.start();
         logger.debug("Server started, listening on " + port);
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -62,7 +43,7 @@ public class UserCenterServer {
     /**
      * Stop serving requests and shutdown resources.
      */
-    public void stop() {
+    void stop() {
         if (server != null) {
             server.shutdown();
         }
@@ -78,10 +59,9 @@ public class UserCenterServer {
     }
 
     public static void main(String[] args) throws Exception {
-        UserCenterRepository repository = new UserCenterRepositoryImpl();
-        MailSender sender = new MailSender163("user_hanschen@163.com", "12345678abc");
-        AuthManager authManager = new AuthManagerImpl();
-        UserCenterServer server = new UserCenterServer(8980, repository, sender, authManager);
+        UserCenterService service = new UserCenterService();
+        DaggerApplicationComponent.builder().applicationModule(new ApplicationModule()).build().inject(service);
+        UserCenterServer server = new UserCenterServer(8980, service);
         server.start();
         server.blockUntilShutdown();
     }
