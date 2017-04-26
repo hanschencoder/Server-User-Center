@@ -9,5 +9,11 @@ public interface AuthManager {
 
     boolean checkVerificationCode(String email, String verificationCode);
 
+    void addToken(String email, String token);
+
+    void removeToken(String token);
+
+    String getEmailByToken(String token);
+
     void stop();
 }

@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.mail.Multipart;
@@ -17,7 +19,7 @@ import freemarker.template.TemplateException;
 import io.grpc.stub.StreamObserver;
 import site.hanschen.api.user.auth.AuthManager;
 import site.hanschen.api.user.db.UserCenterRepository;
-import site.hanschen.api.user.db.entity.User;
+import site.hanschen.api.user.db.entity.*;
 import site.hanschen.api.user.mail.MailSender;
 import site.hanschen.api.user.mail.MultipartBuilder;
 import site.hanschen.api.user.utils.TextUtils;
@@ -60,6 +62,9 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
                 builder.setErrCode(LoginReply.ErrorCode.ACCOUNT_PASSWORD_INCORRECT);
             } else {
                 builder.setSucceed(true);
+                String token = UUID.randomUUID().toString();
+                builder.setToken(token);
+                mAuthManager.addToken(username, token);
             }
         }
 
@@ -165,14 +170,69 @@ public class UserCenterService extends UserCenterGrpc.UserCenterImplBase {
     }
 
     @Override
-    public void requestUserInfo(OperateToken request, StreamObserver<UserInfo> responseObserver) {
-        super.requestUserInfo(request, responseObserver);
-        // TODO:
+    public void requestUserInfo(OperateToken request, StreamObserver<UserInfoReply> responseObserver) {
+        String token = request.getToken();
+        String email = mAuthManager.getEmailByToken(token);
+        User user = mUserRepository.getUserByEmail(email);
+
+        UserInfoReply.Builder builder = UserInfoReply.newBuilder();
+        builder.setSucceed(false);
+        if (email == null || user == null) {
+            builder.setSucceed(false);
+            builder.setErrCode(UserInfoReply.ErrorCode.TOKEN_INVALID);
+        } else {
+
+            site.hanschen.api.user.db.entity.UserInfo userInfo = mUserRepository.getUserInfo(user.getUserId());
+            if (userInfo == null) {
+                userInfo = new site.hanschen.api.user.db.entity.UserInfo();
+                userInfo.setUserId(user.getUserId());
+                userInfo.setNickname("");
+                userInfo.setPhone("");
+                userInfo.setBirthday(Date.valueOf("1990-01-01"));
+                userInfo.setSex((short) 0);
+                userInfo.setBio("");
+                mUserRepository.insertOrUpdateUserInfo(userInfo);
+            }
+
+            UserInfo.Builder userBuilder = UserInfo.newBuilder();
+            userBuilder.setNickname(userInfo.getNickname());
+            userBuilder.setPhone(userInfo.getPhone());
+            userBuilder.setBirthday(userInfo.getBirthday().toString());
+            userBuilder.setSex(userInfo.getSex() == 0 ? Sex.MALE : Sex.FEMALE);
+            userBuilder.setBio(userInfo.getBio());
+
+            builder.setSucceed(true);
+            builder.setUserInfo(userBuilder.build());
+        }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
     public void updateUserInfo(UpdateRequest request, StreamObserver<ResultReply> responseObserver) {
-        super.updateUserInfo(request, responseObserver);
-        // TODO:
+        String token = request.getToken();
+        UserInfo userInfo = request.getUserInfo();
+
+        logger.debug(userInfo.toString());
+        ResultReply.Builder builder = ResultReply.newBuilder();
+        builder.setSecceed(false);
+        String email = mAuthManager.getEmailByToken(token);
+        User user = mUserRepository.getUserByEmail(email);
+        if (email != null && user != null) {
+            site.hanschen.api.user.db.entity.UserInfo info = mUserRepository.getUserInfo(user.getUserId());
+            if (info != null) {
+                info.setNickname(userInfo.getNickname());
+                info.setPhone(userInfo.getPhone());
+                logger.debug(Date.valueOf(userInfo.getBirthday()).toString());
+                info.setBirthday(Date.valueOf(userInfo.getBirthday()));
+                info.setSex((short) (userInfo.getSex() == Sex.MALE ? 0 : 1));
+                info.setBio(userInfo.getBio());
+                builder.setSecceed(mUserRepository.insertOrUpdateUserInfo(info));
+            }
+        }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 }

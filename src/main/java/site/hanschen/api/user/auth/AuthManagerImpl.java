@@ -3,7 +3,9 @@ package site.hanschen.api.user.auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -18,11 +20,13 @@ public class AuthManagerImpl implements AuthManager {
 
     private Logger logger = LoggerFactory.getLogger(UserCenterService.class);
 
-    private final Queue<VerificationCode>     verificationCodes;
-    private       ScheduledThreadPoolExecutor scheduler;
+    private final Queue<VerificationCode>           verificationCodes;
+    private final ConcurrentHashMap<String, String> tokens;
+    private       ScheduledThreadPoolExecutor       scheduler;
 
     public AuthManagerImpl() {
         verificationCodes = new ConcurrentLinkedQueue<>();
+        tokens = new ConcurrentHashMap<>();
         init();
     }
 
@@ -66,8 +70,36 @@ public class AuthManagerImpl implements AuthManager {
     @Override
     public void stop() {
         verificationCodes.clear();
+        tokens.clear();
         scheduler.shutdown();
         scheduler = null;
+    }
+
+    @Override
+    public void addToken(String email, String token) {
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(token)) {
+            return;
+        }
+        for (Map.Entry<String, String> entity : tokens.entrySet()) {
+            if (entity.getValue().equals(email)) {
+                tokens.remove(entity.getKey());
+                break;
+            }
+        }
+        tokens.put(token, email);
+    }
+
+    @Override
+    public void removeToken(String token) {
+        if (TextUtils.isEmpty(token)) {
+            return;
+        }
+        tokens.remove(token);
+    }
+
+    @Override
+    public String getEmailByToken(String token) {
+        return tokens.get(token);
     }
 
     private Runnable mVerificationCleaner = new Runnable() {

@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2017/4/18 21:53:09                           */
+/* Created on:     2017/4/26 20:21:58                           */
 /*==============================================================*/
 
 
@@ -17,7 +17,8 @@ create table User
    email                varchar(128) not null,
    password             varchar(64) not null,
    password_md5         varchar(256) not null,
-   primary key (user_id)
+   primary key (user_id),
+   unique key AK_Key_2 (email)
 )
 charset = UTF8;
 
@@ -26,17 +27,15 @@ charset = UTF8;
 /*==============================================================*/
 create table UserInfo
 (
-   id                   bigint not null auto_increment,
-   user_id              bigint,
-   email                varchar(128) not null,
+   user_info_id         bigint not null auto_increment,
+   user_id              bigint not null,
    nickname             varchar(50),
    phone                varchar(20),
    birthday             date,
-   age                  smallint,
    sex                  smallint,
    bio                  varchar(100),
-   location             varchar(100),
-   primary key (id)
+   primary key (user_info_id),
+   unique key AK_Key_2 (user_id)
 )
 charset = UTF8;
 

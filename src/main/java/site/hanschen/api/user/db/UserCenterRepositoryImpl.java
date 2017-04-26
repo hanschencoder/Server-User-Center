@@ -10,6 +10,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import site.hanschen.api.user.db.entity.User;
+import site.hanschen.api.user.db.entity.UserInfo;
 
 /**
  * @author HansChen
@@ -65,6 +66,33 @@ public class UserCenterRepositoryImpl implements UserCenterRepository {
                 return session.createQuery(query).uniqueResult();
             }
         }.execute(getSession()).getResult();
+    }
+
+    @Override
+    @Nullable
+    public UserInfo getUserInfo(final long id) {
+        return new TransactionExecutor<UserInfo>() {
+            @Override
+            protected UserInfo doTransaction(Session session) {
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<UserInfo> query = builder.createQuery(UserInfo.class);
+                Root<UserInfo> root = query.from(UserInfo.class);
+                query.select(root).where(builder.equal(root.get("userId"), id));
+
+                return session.createQuery(query).uniqueResult();
+            }
+        }.execute(getSession()).getResult();
+    }
+
+    @Override
+    public boolean insertOrUpdateUserInfo(UserInfo userInfo) {
+        return new TransactionExecutor<Void>() {
+            @Override
+            protected Void doTransaction(Session session) {
+                session.saveOrUpdate(userInfo);
+                return null;
+            }
+        }.execute(getSession()).isSucceed();
     }
 
     public static void main(String[] args) {

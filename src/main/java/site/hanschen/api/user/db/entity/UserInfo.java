@@ -12,46 +12,13 @@ import javax.persistence.Id;
  */
 @Entity
 public class UserInfo {
-    private long id;
-    private Long userId;
-    private String email;
     private String nickname;
     private String phone;
     private Date birthday;
-    private Short age;
     private Short sex;
     private String bio;
-    private String location;
-
-    @Id
-    @Column(name = "id", nullable = false)
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Basic
-    @Column(name = "user_id", nullable = true)
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    @Basic
-    @Column(name = "email", nullable = false, length = 128)
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    private long userInfoId;
+    private long userId;
 
     @Basic
     @Column(name = "nickname", nullable = true, length = 50)
@@ -84,16 +51,6 @@ public class UserInfo {
     }
 
     @Basic
-    @Column(name = "age", nullable = true)
-    public Short getAge() {
-        return age;
-    }
-
-    public void setAge(Short age) {
-        this.age = age;
-    }
-
-    @Basic
     @Column(name = "sex", nullable = true)
     public Short getSex() {
         return sex;
@@ -113,14 +70,14 @@ public class UserInfo {
         this.bio = bio;
     }
 
-    @Basic
-    @Column(name = "location", nullable = true, length = 100)
-    public String getLocation() {
-        return location;
+    @Id
+    @Column(name = "user_info_id", nullable = false)
+    public long getUserInfoId() {
+        return userInfoId;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setUserInfoId(long userInfoId) {
+        this.userInfoId = userInfoId;
     }
 
     @Override
@@ -132,11 +89,7 @@ public class UserInfo {
 
         UserInfo userInfo = (UserInfo) o;
 
-        if (id != userInfo.id)
-            return false;
-        if (userId != null ? !userId.equals(userInfo.userId) : userInfo.userId != null)
-            return false;
-        if (email != null ? !email.equals(userInfo.email) : userInfo.email != null)
+        if (userInfoId != userInfo.userInfoId)
             return false;
         if (nickname != null ? !nickname.equals(userInfo.nickname) : userInfo.nickname != null)
             return false;
@@ -144,13 +97,9 @@ public class UserInfo {
             return false;
         if (birthday != null ? !birthday.equals(userInfo.birthday) : userInfo.birthday != null)
             return false;
-        if (age != null ? !age.equals(userInfo.age) : userInfo.age != null)
-            return false;
         if (sex != null ? !sex.equals(userInfo.sex) : userInfo.sex != null)
             return false;
         if (bio != null ? !bio.equals(userInfo.bio) : userInfo.bio != null)
-            return false;
-        if (location != null ? !location.equals(userInfo.location) : userInfo.location != null)
             return false;
 
         return true;
@@ -158,16 +107,22 @@ public class UserInfo {
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (userId != null ? userId.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (nickname != null ? nickname.hashCode() : 0);
+        int result = nickname != null ? nickname.hashCode() : 0;
         result = 31 * result + (phone != null ? phone.hashCode() : 0);
         result = 31 * result + (birthday != null ? birthday.hashCode() : 0);
-        result = 31 * result + (age != null ? age.hashCode() : 0);
         result = 31 * result + (sex != null ? sex.hashCode() : 0);
         result = 31 * result + (bio != null ? bio.hashCode() : 0);
-        result = 31 * result + (location != null ? location.hashCode() : 0);
+        result = 31 * result + (int) (userInfoId ^ (userInfoId >>> 32));
         return result;
+    }
+
+    @Basic
+    @Column(name = "user_id", nullable = false)
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 }
